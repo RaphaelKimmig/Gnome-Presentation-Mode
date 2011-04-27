@@ -1,0 +1,21 @@
+Have you been annoyed by gnome 3 turning off your display while you were
+trying to watch eg Youtube videos?  No worries, you shall be helped :-)
+
+Gnome-Presentation-Mode is a tiny gnome-shell extension that adds a new
+entry to the power menu. While presentation mode is on the screensaver
+and the automatic suspend will not kick in, allowing you to sit back and
+enjoy whatever you are doing without having to wiggle the mouse every
+few minutes.
+
+
+Installation instructions: Just clone the repo, copy the extension in
+your gnome-shell extensions directory and restart gnome-shell (default:
+alt+f2, type r, press enter).
+
+git clone git@github.com:RaphaelKimmig/Gnome-Presentation-Mode.git
+
+cd Gnome-Presentation-Mode
+
+mkdir -p ~/.local/share/gnome-shell/extensions/
+
+cp -r presentationmode@ampad.de ~/.local/share/gnome-shell/extensions/
