@@ -1,5 +1,5 @@
 {
-"shell-version": ["3.0.1"],
+"shell-version": ["3.0"],
 "uuid": "presentationmode@ampad.de",
 "name": "Presentation mode",
 "description": "Add a presentation mode toggle to the power menu.",
