@@ -3,7 +3,7 @@ const Main = imports.ui.main;
 const Lang = imports.lang;
 const PopupMenu = imports.ui.popupMenu;
 
-const Gettext = imports.gettext.domain('gnome-shell');
+const Gettext = imports.gettext;
 const _ = Gettext.gettext;
 
 const SessionIface = {
@@ -16,6 +16,10 @@ const SessionIface = {
 let SessionProxy = DBus.makeProxyClass(SessionIface);
 
 function main(extensionMeta) {
+    Gettext.bindtextdomain("gnome-shell-extension-presentationmode",
+                           extensionMeta.path + "/locale");
+    Gettext.textdomain("gnome-shell-extension-presentationmode");
+
     let Power = Main.Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['battery'];
 
     Power.prototype.__init = Power.prototype._init;
