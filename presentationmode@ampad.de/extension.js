@@ -15,7 +15,9 @@ const SessionIface = {
 };
 let SessionProxy = DBus.makeProxyClass(SessionIface);
 
-function main(extensionMeta) {
+function init(){};
+
+function enable(extensionMeta) {
     Gettext.bindtextdomain("gnome-shell-extension-presentationmode",
                            extensionMeta.path + "/locale");
     Gettext.textdomain("gnome-shell-extension-presentationmode");
@@ -51,4 +53,8 @@ function main(extensionMeta) {
     Power.prototype._onInhibit = function(cookie) {
         this._inhibit = cookie;
     };
+};
+
+function main(){
+    enable();
 };
