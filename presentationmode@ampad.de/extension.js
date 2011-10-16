@@ -29,9 +29,9 @@ function PresentationMode() {
 			else {
 				try {
 					this._sessionProxy.InhibitRemote(
-										"presentor", 0,
-										"Presentation Mode", 9,
-										Lang.bind(this, this._onInhibit)
+							"presentor", 0,
+							""Presentation Mode", 9,
+							Lang.bind(this, this._onInhibit)
 					);
 				}
 				catch (e) { 
@@ -41,8 +41,8 @@ function PresentationMode() {
 		} 	
 	));
 	this.menu.addMenuItem(this.m);
-	this._onInhibit = function (cookie) {
-		this._inhibit = cookie;
+	this._onInhibit = function (inhibit_cookie) {
+		this._inhibit = inhibit_cookie;
 	}
 }
 
