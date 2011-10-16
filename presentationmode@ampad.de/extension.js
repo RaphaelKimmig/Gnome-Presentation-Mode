@@ -25,6 +25,8 @@ function PresentationMode() {
 			if (this._inhibit) {
 				this._sessionProxy.UninhibitRemote(this._inhibit);
 				this._inhibit = undefined;
+				Main.Util.spawn(['xset', '+dpms']); // disable
+				Main.Util.spawn(['xset', 's', 'on']);
 			}
 			else {
 				try {
@@ -33,6 +35,8 @@ function PresentationMode() {
 							"Presentation Mode", 9,
 							Lang.bind(this, this._onInhibit)
 					);
+					Main.Util.spawn(['xset', '-dpms']); // enable
+					Main.Util.spawn(['xset', 's', 'off']);
 				}
 				catch (e) { 
 				//
