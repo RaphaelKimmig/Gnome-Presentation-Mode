@@ -2,59 +2,67 @@ const DBus = imports.dbus;
 const Main = imports.ui.main;
 const Lang = imports.lang;
 const PopupMenu = imports.ui.popupMenu;
-
-const Gettext = imports.gettext;
+const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
 const SessionIface = {
     name: "org.gnome.SessionManager",
-    methods: [ 
-    { name: "Inhibit", inSignature: "susu", outSignature: "u" },
-    { name: "Uninhibit", inSignature: "u", outSignature: "" }
-    ]
+	methods: [
+		{ name: "Inhibit", inSignature: "susu", outSignature: "u" },
+		{ name: "Uninhibit", inSignature: "u", outSignature: "" }
+	]
 };
+
 let SessionProxy = DBus.makeProxyClass(SessionIface);
 
-function init(){};
+function PresentationMode() {
+	let present;	
+	this._inhibit = undefined;
+	this._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
+	this.m = new PopupMenu.PopupSwitchMenuItem(_("Presentation Mode"));
+	this.m.connect('toggled', Lang.bind(this,
+		function () {
+			if (this._inhibit) {
+				this._sessionProxy.UninhibitRemote(this._inhibit);
+				this._inhibit = undefined;
+			}
+			else {
+				try {
+					this._sessionProxy.InhibitRemote(
+										"presentor", 0,
+										"Presentation Mode", 9,
+										Lang.bind(this, this._onInhibit)
+					);
+				}
+				catch (e) { 
+				//
+				}
+			}
+		} 	
+	));
+	this.menu.addMenuItem(this.m);
+	this._onInhibit = function (cookie) {
+		this._inhibit = cookie;
+	}
+}
 
-function enable(extensionMeta) {
-    Gettext.bindtextdomain("gnome-shell-extension-presentationmode",
-                           extensionMeta.path + "/locale");
-    Gettext.textdomain("gnome-shell-extension-presentationmode");
+function KillPresent() {
+	menuitem = this.menu.numMenuItems;
+	this.menu._getMenuItems()[menuitem-1].destroy();
+}
 
-    let Power = Main.Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['battery'];
+function init(metadata) {
+	// no init data
+}
 
-    Power.prototype.__init = Power.prototype._init;
-    Power.prototype._init = function () {
-        this.__init.apply(this, arguments);
-        this._inhibit = undefined;
-        this._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
-        this._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), false);
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addMenuItem(this._presentationswitch);
-        this._presentationswitch.connect('toggled', Lang.bind(this, function() {
-            if(this._inhibit) {
-                this._sessionProxy.UninhibitRemote(this._inhibit);
-                this._inhibit = undefined;
-            } else {
-                try {
-                    this._sessionProxy.InhibitRemote("presentor",
-                        0, 
-                        "Presentation mode",
-                        9,
-                        Lang.bind(this, this._onInhibit));
-                } catch(e) {
-                    //
-                }
-            }
+let Power;
 
-        }));
-    };
-    Power.prototype._onInhibit = function(cookie) {
-        this._inhibit = cookie;
-    };
-};
+function enable() {
+	Power = Main.panel._statusArea.battery;
+	PresentationMode.call(Power);
+}
 
-function main(){
-    enable();
-};
+function disable() {
+	Power = Main.panel._statusArea.battery;
+	KillPresent.call(Power);
+}
