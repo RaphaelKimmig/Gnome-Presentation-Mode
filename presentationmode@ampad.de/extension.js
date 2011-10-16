@@ -30,7 +30,7 @@ function PresentationMode() {
 				try {
 					this._sessionProxy.InhibitRemote(
 							"presentor", 0,
-							""Presentation Mode", 9,
+							"Presentation Mode", 9,
 							Lang.bind(this, this._onInhibit)
 					);
 				}
