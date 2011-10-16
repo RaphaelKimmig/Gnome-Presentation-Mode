@@ -1,4 +1,4 @@
-Have you been annoyed by gnome 3 turning off your display while you were
+Have you been annoyed by GNOME 3 turning off your display while you were
 trying to watch eg Youtube videos?  No worries, you shall be helped :-)
 
 Gnome-Presentation-Mode is a tiny gnome-shell extension that adds a new
@@ -8,6 +8,8 @@ automatic suspend will not kick in, allowing you to sit back and enjoy
 whatever you are doing without having to wiggle the mouse every few
 minutes.
 
+WARNING: This maybe works on GNOME 3.2 ONLY
+
 Installation instructions:
 
 - Just clone the repo, copy the extension to your gnome-shell extensions
@@ -15,7 +17,6 @@ Installation instructions:
 
 - Just enable or disable in Gnome Tweak Tool if Gnome Tweak Tool is
   installed.
-
 
 git clone https://github.com/whakim/Gnome-Presentation-Mode.git
 
@@ -25,7 +26,7 @@ mkdir -p ~/.local/share/gnome-shell/extensions/
 
 cp -r presentationmode@ampad.de ~/.local/share/gnome-shell/extensions/
 
-Hakim 2011
+(c) Hakim 2011
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
