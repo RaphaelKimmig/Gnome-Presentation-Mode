@@ -50,11 +50,6 @@ function PresentationMode() {
 	}
 }
 
-function KillPresent() {
-	menuitem = this.menu.numMenuItems;
-	this.menu._getMenuItems()[menuitem-1].destroy();
-}
-
 function init(metadata) {
 	// no init data
 }
@@ -68,5 +63,11 @@ function enable() {
 
 function disable() {
 	Power = Main.panel._statusArea.battery;
-	KillPresent.call(Power);
+	Power.m.destroy();
+	if (Power._inhibit) {
+		Power._sessionProxy.UninhibitRemote(Power._inhibit);
+		Power._inhibit = undefined;
+		Main.Util.spawn(['xset', '+dpms']); // disable presentation mode
+		Main.Util.spawn(['xset', 's', 'on']);
+	}
 }
