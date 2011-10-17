@@ -1,9 +1,14 @@
+/* -*- mode: js2 - indent-tabs-mode: nil - js2-basic-offset: 4 -*- */
 const DBus = imports.dbus;
-const Main = imports.ui.main;
 const Lang = imports.lang;
-const PopupMenu = imports.ui.popupMenu;
+const St = imports.gi.St;
 
-const Gettext = imports.gettext;
+const Main = imports.ui.main;
+const PopupMenu = imports.ui.popupMenu;
+const GnomeSession = imports.misc.gnomeSession;
+const UserMenu = imports.ui.userMenu;
+
+const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
 const SessionIface = {
@@ -15,40 +20,52 @@ const SessionIface = {
 };
 let SessionProxy = DBus.makeProxyClass(SessionIface);
 
-function main(extensionMeta) {
-    Gettext.bindtextdomain("gnome-shell-extension-presentationmode",
+// Put your extension initialization code here
+function init(extensionMeta) {
+    imports.gettext.bindtextdomain("gnome-shell-extension-presentationmode",
                            extensionMeta.path + "/locale");
-    Gettext.textdomain("gnome-shell-extension-presentationmode");
+    imports.gettext.textdomain("gnome-shell-extension-presentationmode");
+}
 
-    let Power = Main.Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['battery'];
+function enable() {
+    let batteryMenu = Main.panel._statusArea.battery;
 
-    Power.prototype.__init = Power.prototype._init;
-    Power.prototype._init = function () {
-        this.__init.apply(this, arguments);
-        this._inhibit = undefined;
-        this._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
-        this._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), false);
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addMenuItem(this._presentationswitch);
-        this._presentationswitch.connect('toggled', Lang.bind(this, function() {
-            if(this._inhibit) {
-                this._sessionProxy.UninhibitRemote(this._inhibit);
-                this._inhibit = undefined;
+    batteryMenu._itemSeparator = new PopupMenu.PopupSeparatorMenuItem();
+    batteryMenu.menu.addMenuItem(batteryMenu._itemSeparator);
+    batteryMenu._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), false);
+    batteryMenu.menu.addMenuItem(batteryMenu._presentationswitch);
+    batteryMenu._inhibit = undefined;
+    batteryMenu._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
+
+    batteryMenu._onInhibit = function(cookie) {
+        batteryMenu._inhibit = cookie;
+    };
+
+    batteryMenu._presentationswitch.connect('toggled', Lang.bind(batteryMenu, function() {
+        if(batteryMenu._inhibit) {
+            batteryMenu._sessionProxy.UninhibitRemote(batteryMenu._inhibit);
+            batteryMenu._inhibit = undefined;
             } else {
                 try {
-                    this._sessionProxy.InhibitRemote("presentor",
+                    batteryMenu._sessionProxy.InhibitRemote("presentor",
                         0, 
                         "Presentation mode",
                         9,
-                        Lang.bind(this, this._onInhibit));
+                        Lang.bind(batteryMenu, batteryMenu._onInhibit));
                 } catch(e) {
                     //
                 }
             }
+    }));
+}
 
-        }));
-    };
-    Power.prototype._onInhibit = function(cookie) {
-        this._inhibit = cookie;
-    };
-};
+function disable() {
+    let batteryMenu = Main.panel._statusArea.battery;
+
+    batteryMenu._presentationswitch.destroy();
+    batteryMenu._itemSeparator.destroy();
+    if(batteryMenu._inhibit) {
+        batteryMenu._sessionProxy.UninhibitRemote(batteryMenu._inhibit);
+        batteryMenu._inhibit = undefined;
+        }
+}
