@@ -22,14 +22,30 @@ let SessionProxy = DBus.makeProxyClass(SessionIface);
 
 // Put your extension initialization code here
 function init(extensionMeta) {
+    // To Avoid issues and glitching, this needs to be placed here as
+    // batteryMenu must be constant after initialization to avoid
+    // problems with enable and disable functions
+
+    batteryMenu = Main.panel._statusArea.battery;
+    let temp = Main.panel._statusArea.battery._deviceItems;
+    if(temp == "")
+    {//check for no battery or power device, i.e. no power menu
+        lettemp = new Main.Panel.STANDARD_STATUS_AREA_SHELL_IMPLEMENTATION["a11y"]
+        if(Main.panel._statusArea.a11y != null)
+        {//check for no a11y (such as from noa11y extension)
+            batteryMenu = Main.panel._statusArea.a11y;
+        }
+        else
+        {//else use the user menu
+            batteryMenu = Main.panel._statusArea.userMenu;
+        }
+    }
     imports.gettext.bindtextdomain("gnome-shell-extension-presentationmode",
                            extensionMeta.path + "/locale");
     imports.gettext.textdomain("gnome-shell-extension-presentationmode");
 }
 
 function enable() {
-    let batteryMenu = Main.panel._statusArea.battery;
-
     batteryMenu._itemSeparator = new PopupMenu.PopupSeparatorMenuItem();
     batteryMenu.menu.addMenuItem(batteryMenu._itemSeparator);
     batteryMenu._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), false);
@@ -60,8 +76,6 @@ function enable() {
 }
 
 function disable() {
-    let batteryMenu = Main.panel._statusArea.battery;
-
     batteryMenu._presentationswitch.destroy();
     batteryMenu._itemSeparator.destroy();
     if(batteryMenu._inhibit) {
