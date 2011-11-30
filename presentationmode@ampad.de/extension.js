@@ -20,32 +20,36 @@ const SessionIface = {
 };
 let SessionProxy = DBus.makeProxyClass(SessionIface);
 
-// Put your extension initialization code here
+// Initialization code here:
 function init(extensionMeta) {
-    // To Avoid issues and glitching, this needs to be placed here as
-    // batteryMenu must be constant after initialization to avoid
-    // problems with enable and disable functions
-
+    //Default Value on batteryMenu, it maybe changed on enable()
     batteryMenu = Main.panel._statusArea.battery;
-    let temp = Main.panel._statusArea.battery._deviceItems;
-    if(temp == "")
-    {//check for no battery or power device, i.e. no power menu
-        lettemp = new Main.Panel.STANDARD_STATUS_AREA_SHELL_IMPLEMENTATION["a11y"]
-        if(Main.panel._statusArea.a11y != null)
-        {//check for no a11y (such as from noa11y extension)
-            batteryMenu = Main.panel._statusArea.a11y;
-        }
-        else
-        {//else use the user menu
-            batteryMenu = Main.panel._statusArea.userMenu;
-        }
-    }
+    
     imports.gettext.bindtextdomain("gnome-shell-extension-presentationmode",
                            extensionMeta.path + "/locale");
     imports.gettext.textdomain("gnome-shell-extension-presentationmode");
 }
 
 function enable() {
+    //Temporary variable to check power devices
+    let temp = Main.panel._statusArea.battery._deviceItems;
+    if(temp == "")
+    {   //check for no battery or power device, i.e. no battery menu
+        let temp = new Main.Panel.STANDARD_STATUS_AREA_SHELL_IMPLEMENTATION["a11y"]
+        if(Main.panel._statusArea.a11y != null)
+        {   //check for no a11y (such as from noa11y extension)
+            batteryMenu = Main.panel._statusArea.a11y;
+        }
+        else
+        {   //else wise, resort to using the user menu
+            batteryMenu = Main.panel._statusArea.userMenu;
+        }
+    }
+    else
+    {   //If all else is good, the battery menu is fine
+        batteryMenu = Main.panel._statusArea.battery;
+    }
+    //Add the Presentation mode Option
     batteryMenu._itemSeparator = new PopupMenu.PopupSeparatorMenuItem();
     batteryMenu.menu.addMenuItem(batteryMenu._itemSeparator);
     batteryMenu._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), false);
