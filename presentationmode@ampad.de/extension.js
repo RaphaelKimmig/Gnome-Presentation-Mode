@@ -35,7 +35,6 @@ function enable() {
     let temp = Main.panel._statusArea.battery._deviceItems;
     if(temp == "")
     {   //check for no battery or power device, i.e. no battery menu
-        let temp = new Main.Panel.STANDARD_STATUS_AREA_SHELL_IMPLEMENTATION["a11y"]
         if(Main.panel._statusArea.a11y != null)
         {   //check for no a11y (such as from noa11y extension)
             batteryMenu = Main.panel._statusArea.a11y;
