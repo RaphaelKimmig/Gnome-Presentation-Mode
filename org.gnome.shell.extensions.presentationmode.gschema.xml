@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.presentationmode" path="/org/gnome/shell/extensions/presentationmode/">
+    <key type="b" name="state">
+      <default>false</default>
+      <summary>State of the presentation mode toggle</summary>
+    </key>
+   </schema>
+</schemalist>
