@@ -21,9 +21,9 @@ mkdir -p ~/.local/share/gnome-shell/extensions/
 
 cp -r presentationmode@ampad.de ~/.local/share/gnome-shell/extensions/
 
-sudo cp org.gnome.shell.extensions.presentationmode.gschema.xml /usr/share/glib-2.0
+sudo cp org.gnome.shell.extensions.presentationmode.gschema.xml /usr/share/glib-2.0/schemas
 
-sudo glib-compile-schemas /usr/share/glib-2.0
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 
 
 Copyright (C) 2011, Raphael Kimmig
