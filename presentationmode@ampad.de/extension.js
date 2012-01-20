@@ -8,7 +8,7 @@ const PopupMenu = imports.ui.popupMenu;
 const GnomeSession = imports.misc.gnomeSession;
 const UserMenu = imports.ui.userMenu;
 
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
+const Gettext = imports.gettext.domain('gnome-shell-extension-presentationmode');
 const _ = Gettext.gettext;
 
 const SessionIface = {
@@ -24,7 +24,6 @@ let SessionProxy = DBus.makeProxyClass(SessionIface);
 function init(extensionMeta) {
     imports.gettext.bindtextdomain("gnome-shell-extension-presentationmode",
                            extensionMeta.path + "/locale");
-    imports.gettext.textdomain("gnome-shell-extension-presentationmode");
 }
 
 function enable() {
