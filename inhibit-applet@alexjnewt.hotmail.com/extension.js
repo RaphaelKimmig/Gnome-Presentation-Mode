@@ -27,7 +27,6 @@ function init(extensionMeta) {
     
     imports.gettext.bindtextdomain("gnome-shell-extension-inhibitapplet",
                            extensionMeta.path + "/locale");
-    imports.gettext.textdomain("gnome-shell-extension-inhibitapplet");
 }
 
 function enable() {
