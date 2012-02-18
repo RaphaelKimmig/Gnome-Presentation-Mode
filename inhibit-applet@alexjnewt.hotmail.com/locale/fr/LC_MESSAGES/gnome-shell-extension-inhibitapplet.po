@@ -13,7 +13,7 @@ msgstr ""
 "X-Poedit-Basepath: ../../../\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: extension.js:54
+#: extension.js:53
 msgid "Inhibit Suspend"
 msgstr "Inhiber la Pause"
 

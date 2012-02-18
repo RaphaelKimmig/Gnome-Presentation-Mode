@@ -8,12 +8,12 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: Jeremy Newton <alexjnewt@hotmail.com>\n"
 "Language-Team: Jeremy Newton <alexjnewt@hotmail.com>\n"
-"X-Poedit-Language: English\n"
+"X-Poedit-Language: Polish\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: ../../../\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #: extension.js:53
 msgid "Inhibit Suspend"
-msgstr "Inhibit Suspend"
+msgstr "Wstrzymaj Usypianie"
 
