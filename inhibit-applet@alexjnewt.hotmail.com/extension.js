@@ -8,7 +8,7 @@ const PopupMenu = imports.ui.popupMenu;
 const GnomeSession = imports.misc.gnomeSession;
 const UserMenu = imports.ui.userMenu;
 
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
+const Gettext = imports.gettext.domain('gnome-shell-extension-inhibitapplet');
 const _ = Gettext.gettext;
 
 const SessionIface = {
@@ -25,9 +25,9 @@ function init(extensionMeta) {
     //Default Value on batteryMenu, it maybe changed on enable()
     batteryMenu = Main.panel._statusArea.battery;
     
-    imports.gettext.bindtextdomain("gnome-shell-extension-presentationmode",
+    imports.gettext.bindtextdomain("gnome-shell-extension-inhibitapplet",
                            extensionMeta.path + "/locale");
-    imports.gettext.textdomain("gnome-shell-extension-presentationmode");
+    imports.gettext.textdomain("gnome-shell-extension-inhibitapplet");
 }
 
 function enable() {
@@ -48,11 +48,11 @@ function enable() {
     {   //If all else is good, the battery menu is fine
         batteryMenu = Main.panel._statusArea.battery;
     }
-    //Add the Presentation mode Option
+    //Add the Inhibit Option
     batteryMenu._itemSeparator = new PopupMenu.PopupSeparatorMenuItem();
     batteryMenu.menu.addMenuItem(batteryMenu._itemSeparator);
-    batteryMenu._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), false);
-    batteryMenu.menu.addMenuItem(batteryMenu._presentationswitch);
+    batteryMenu._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), false);
+    batteryMenu.menu.addMenuItem(batteryMenu._inhibitswitch);
     batteryMenu._inhibit = undefined;
     batteryMenu._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
 
@@ -60,15 +60,15 @@ function enable() {
         batteryMenu._inhibit = cookie;
     };
 
-    batteryMenu._presentationswitch.connect('toggled', Lang.bind(batteryMenu, function() {
+    batteryMenu._inhibitswitch.connect('toggled', Lang.bind(batteryMenu, function() {
         if(batteryMenu._inhibit) {
             batteryMenu._sessionProxy.UninhibitRemote(batteryMenu._inhibit);
             batteryMenu._inhibit = undefined;
             } else {
                 try {
-                    batteryMenu._sessionProxy.InhibitRemote("presentor",
+                    batteryMenu._sessionProxy.InhibitRemote("inhibitor",
                         0, 
-                        "Presentation mode",
+                        "inhibit mode",
                         9,
                         Lang.bind(batteryMenu, batteryMenu._onInhibit));
                 } catch(e) {
@@ -79,7 +79,7 @@ function enable() {
 }
 
 function disable() {
-    batteryMenu._presentationswitch.destroy();
+    batteryMenu._inhibitswitch.destroy();
     batteryMenu._itemSeparator.destroy();
     if(batteryMenu._inhibit) {
         batteryMenu._sessionProxy.UninhibitRemote(batteryMenu._inhibit);

@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Gnome Shell Extension Inhibit Applet\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Jeremy Newton <alexjnewt@hotmail.com>\n"
+"Language-Team: Jeremy Newton <alexjnewt@hotmail.com>\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-Basepath: ../../../\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: extension.js:54
+msgid "Inhibit Suspend"
+msgstr "Inhiber la Pause"
+
