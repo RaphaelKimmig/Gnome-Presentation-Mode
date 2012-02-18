@@ -4,7 +4,7 @@ Gnome Shell Extension Inhibit Applet is a gnome shell extension that gives you t
 
 This was forked from Raphael Kimmig's Gnome-Presentation-Mode, in hopes to improve it and add more translations. I don't take an credit for the work that he has done on this extension so far.
 
-![Screenshot](https://github.com/Mystro256/gnome-shell-extension-inhibit-applet/raw/master/Screenshot a11y.png)![Screenshot2](https://github.com/Mystro256/gnome-shell-extension-inhibit-applet/raw/master/Screenshot power.png)
+![Screenshot1](https://github.com/Mystro256/gnome-shell-extension-inhibit-applet/raw/master/Screenshot power.png)![Screenshot2](https://github.com/Mystro256/gnome-shell-extension-inhibit-applet/raw/master/Screenshot ally.png)
 
 ## Installation instructions:
 Go onto https://extensions.gnome.org and find the extension. It's much easier to install it through that website than manually.
