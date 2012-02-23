@@ -30,9 +30,9 @@ function init(extensionMeta) {
 }
 
 function enable() {
-    //Temporary variable to check power devices
-    let temp = Main.panel._statusArea.battery._deviceItems;
-    if(temp == "")
+    //Check if battery menu is visible
+    //Then check if a11y menu is visible
+    if(!Main.panel._statusArea.battery.actor.get_paint_visibility())
     {   //check for no battery or power device, i.e. no battery menu
         if(Main.panel._statusArea.a11y != null)
         {   //check for no a11y (such as from noa11y extension)
