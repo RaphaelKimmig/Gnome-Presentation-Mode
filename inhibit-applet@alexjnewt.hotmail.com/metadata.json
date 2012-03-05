@@ -3,5 +3,6 @@
 "uuid": "inhibit-applet@alexjnewt.hotmail.com",
 "name": "Inhibit Applet",
 "description": "Adds the ability to inhibit suspend/screensaver",
-"url": "https://github.com/Mystro256/gnome-shell-extension-inhibit-applet"
+"url": "https://github.com/Mystro256/gnome-shell-extension-inhibit-applet",
+"version": 5
 }

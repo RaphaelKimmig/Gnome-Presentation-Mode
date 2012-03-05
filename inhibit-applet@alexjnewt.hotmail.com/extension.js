@@ -4,7 +4,7 @@ const Lang = imports.lang;
 const St = imports.gi.St;
 
 const Main = imports.ui.main;
-const Mainloop = imports.mainloop;
+const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GnomeSession = imports.misc.gnomeSession;
 const UserMenu = imports.ui.userMenu;
@@ -19,69 +19,67 @@ const SessionIface = {
     { name: "Uninhibit", inSignature: "u", outSignature: "" }
     ]
 };
+
 let SessionProxy = DBus.makeProxyClass(SessionIface);
+let indicationmenu;
+
+//Icon variables for easy editing/customization:
+let DisabledIcon = 'preferences-desktop-screensaver-symbolic';
+let EnabledIcon = 'system-run-symbolic';
+////An alternative icon could be:
+//let EnabledIcon = 'action-unavailable-symbolic';
 
 function init(extensionMeta) {
-    parentMenu = undefined; //Initialize to undefined
     imports.gettext.bindtextdomain("gnome-shell-extension-inhibitapplet",
                            extensionMeta.path + "/locale");
 }
 
-function enable() {
-    if(parentMenu == undefined){ //Hack to fix issue #1, refresh after 5 seconds
-        Mainloop.timeout_add_seconds(5, Lang.bind(this, function() {
-                this.disable();
-                this.enable();}));
-    }
-    //Check if battery menu is invisible
-    if(!Main.panel._statusArea.battery.actor.get_paint_visibility())
-    {   //check for no battery or power device, i.e. no battery menu
-        if(Main.panel._statusArea.a11y != null)
-        {   //check for no a11y (such as from noa11y extension)
-            parentMenu = Main.panel._statusArea.a11y;
-        }
-        else {   //else wise, resort to using the user menu
-            parentMenu = Main.panel._statusArea.userMenu;
-        }
-    }
-    else {   //If all else is good, the battery menu is fine
-        parentMenu = Main.panel._statusArea.battery;
-    }
-    //Add the Inhibit Option
-    parentMenu._itemSeparator = new PopupMenu.PopupSeparatorMenuItem();
-    parentMenu.menu.addMenuItem(parentMenu._itemSeparator);
-    parentMenu._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), false);
-    parentMenu.menu.addMenuItem(parentMenu._inhibitswitch);
-    parentMenu._inhibit = undefined;
-    parentMenu._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
-
-    parentMenu._onInhibit = function(cookie) {
-        parentMenu._inhibit = cookie;
-    };
-
-    parentMenu._inhibitswitch.connect('toggled', Lang.bind(parentMenu, function() {
-        if(parentMenu._inhibit) {
-            parentMenu._sessionProxy.UninhibitRemote(parentMenu._inhibit);
-            parentMenu._inhibit = undefined;
-            } else {
-                try {
-                    parentMenu._sessionProxy.InhibitRemote("inhibitor",
-                        0, 
-                        "inhibit mode",
-                        9,
-                        Lang.bind(parentMenu, parentMenu._onInhibit));
-                } catch(e) {
-                    //
-                }
-            }
-    }));
+function InhibitMenu() {
+    this._init.apply(this, arguments);
 }
 
+function enable() {
+    indicationmenu = new InhibitMenu();
+    Main.panel.addToStatusArea('inhibit-menu', indicationmenu);
+}
+
+InhibitMenu.prototype = {
+    __proto__: PanelMenu.SystemStatusButton.prototype,
+
+    _init: function() {
+        PanelMenu.SystemStatusButton.prototype._init.call(this, DisabledIcon);
+
+        //Add the Inhibit Option
+        this._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), false);
+        this.menu.addMenuItem(this._inhibitswitch);
+        this._inhibit = undefined;
+        this._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
+
+        this._onInhibit = function(cookie) {
+                this._inhibit = cookie;
+        };
+
+        this._inhibitswitch.connect('toggled', Lang.bind(this, function() {
+                if(this._inhibit) {
+                        this._sessionProxy.UninhibitRemote(this._inhibit);
+                        this._inhibit = undefined;
+                        this.setIcon(DisabledIcon);
+                } else {
+                        try {
+                                this._sessionProxy.InhibitRemote("inhibitor",
+                                        0, 
+                                        "inhibit mode",
+                                        9,
+                                Lang.bind(this, this._onInhibit));
+                                this.setIcon(EnabledIcon);
+                        } catch(e) {
+                                //
+                        }
+                }
+        }));
+    },
+};
+
 function disable() {
-    parentMenu._inhibitswitch.destroy();
-    parentMenu._itemSeparator.destroy();
-    if(parentMenu._inhibit) {
-        parentMenu._sessionProxy.UninhibitRemote(parentMenu._inhibit);
-        parentMenu._inhibit = undefined;
-        }
+	indicationmenu.destroy();
 }
