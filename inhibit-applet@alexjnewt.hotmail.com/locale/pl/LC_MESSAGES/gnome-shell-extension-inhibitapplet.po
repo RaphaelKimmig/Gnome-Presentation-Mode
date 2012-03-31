@@ -15,5 +15,5 @@ msgstr ""
 
 #: extension.js:53
 msgid "Inhibit Suspend"
-msgstr "Wstrzymaj Usypianie"
+msgstr "Wstrzymaj usypianie"
 

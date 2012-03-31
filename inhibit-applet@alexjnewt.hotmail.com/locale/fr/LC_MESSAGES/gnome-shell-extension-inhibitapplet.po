@@ -15,5 +15,5 @@ msgstr ""
 
 #: extension.js:53
 msgid "Inhibit Suspend"
-msgstr "Inhiber la Pause"
+msgstr "Inhiber la mise en veille"
 
