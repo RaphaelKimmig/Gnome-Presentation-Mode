@@ -2,6 +2,7 @@
 const DBus = imports.dbus;
 const Lang = imports.lang;
 const St = imports.gi.St;
+const Gio = imports.gi.Gio;
 
 const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
@@ -10,15 +11,8 @@ const UserMenu = imports.ui.userMenu;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
-
-const SessionIface = {
-    name: "org.gnome.SessionManager",
-    methods: [ 
-    { name: "Inhibit", inSignature: "susu", outSignature: "u" },
-    { name: "Uninhibit", inSignature: "u", outSignature: "" }
-    ]
-};
-let SessionProxy = DBus.makeProxyClass(SessionIface);
+const POWER_SCHEMA = 'org.gnome.settings-daemon.plugins.power';
+const POWER_KEY = 'active';
 
 // Put your extension initialization code here
 function init(extensionMeta) {
@@ -28,44 +22,27 @@ function init(extensionMeta) {
 }
 
 function enable() {
-    let batteryMenu = Main.panel._statusArea.battery;
+    let batteryMenu = Main.panel._statusArea.userMenu;
 
     batteryMenu._itemSeparator = new PopupMenu.PopupSeparatorMenuItem();
     batteryMenu.menu.addMenuItem(batteryMenu._itemSeparator);
-    batteryMenu._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), false);
+    batteryMenu._powerSettings = new Gio.Settings({ schema: POWER_SCHEMA });
+    var powerManagementFlag = batteryMenu._powerSettings.get_boolean(POWER_KEY);
+    batteryMenu._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), !powerManagementFlag);
     batteryMenu.menu.addMenuItem(batteryMenu._presentationswitch);
-    batteryMenu._inhibit = undefined;
-    batteryMenu._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
-
-    batteryMenu._onInhibit = function(cookie) {
-        batteryMenu._inhibit = cookie;
-    };
-
+    
     batteryMenu._presentationswitch.connect('toggled', Lang.bind(batteryMenu, function() {
-        if(batteryMenu._inhibit) {
-            batteryMenu._sessionProxy.UninhibitRemote(batteryMenu._inhibit);
-            batteryMenu._inhibit = undefined;
-            } else {
-                try {
-                    batteryMenu._sessionProxy.InhibitRemote("presentor",
-                        0, 
-                        "Presentation mode",
-                        9,
-                        Lang.bind(batteryMenu, batteryMenu._onInhibit));
-                } catch(e) {
-                    //
-                }
-            }
+        var powerManagementFlag = batteryMenu._powerSettings.get_boolean(POWER_KEY);
+        batteryMenu._powerSettings.set_boolean(POWER_KEY, !powerManagementFlag);
     }));
 }
 
 function disable() {
-    let batteryMenu = Main.panel._statusArea.battery;
+    let batteryMenu = Main.panel._statusArea.userMenu;
 
     batteryMenu._presentationswitch.destroy();
     batteryMenu._itemSeparator.destroy();
-    if(batteryMenu._inhibit) {
-        batteryMenu._sessionProxy.UninhibitRemote(batteryMenu._inhibit);
-        batteryMenu._inhibit = undefined;
-        }
+    if (batteryMenu._powerSettings) {
+        batteryMenu._powerSettings.set_boolean(POWER_KEY, false);
+    }
 }
