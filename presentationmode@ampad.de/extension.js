@@ -27,8 +27,10 @@ function enable() {
     batteryMenu._itemSeparator = new PopupMenu.PopupSeparatorMenuItem();
     batteryMenu.menu.addMenuItem(batteryMenu._itemSeparator);
     batteryMenu._powerSettings = new Gio.Settings({ schema: POWER_SCHEMA });
+
     var powerManagementFlag = batteryMenu._powerSettings.get_boolean(POWER_KEY);
     batteryMenu._presentationswitch = new PopupMenu.PopupSwitchMenuItem(_("Presentation mode"), !powerManagementFlag);
+
     batteryMenu.menu.addMenuItem(batteryMenu._presentationswitch);
     
     batteryMenu._presentationswitch.connect('toggled', Lang.bind(batteryMenu, function() {
