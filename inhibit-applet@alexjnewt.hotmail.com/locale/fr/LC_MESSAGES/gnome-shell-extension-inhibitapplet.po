@@ -13,7 +13,11 @@ msgstr ""
 "X-Poedit-Basepath: ../../../\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: extension.js:53
-msgid "Inhibit Suspend"
-msgstr "Inhiber la mise en veille"
+#: extension.js:24
+msgid "Suspend Inhibited"
+msgstr "La mise en veille Inhibé"
+
+#: extension.js:25
+msgid "Suspend Enabled"
+msgstr "La mise en veille Permise"
 

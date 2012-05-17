@@ -6,14 +6,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
-"Last-Translator: Christian Schramm <christian.h.m.schramm@gmail.com>\n"
-"Language-Team: Christian Schramm <christian.h.m.schramm@gmail.com>\n"
-"X-Poedit-Language: German\n"
+"Last-Translator: Jeremy Newton <alexjnewt@hotmail.com>\n"
+"Language-Team: Jeremy Newton <alexjnewt@hotmail.com>\n"
+"X-Poedit-Language: Spanish\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: ../../../\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: extension.js:53
-msgid "Inhibit Suspend"
-msgstr "Bereitschaft verhindern"
+#: extension.js:24
+msgid "Suspend Inhibited"
+msgstr "Suspender Inhibido"
+
+#: extension.js:25
+msgid "Suspend Enabled"
+msgstr "Suspender Activado"
 
