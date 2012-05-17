@@ -15,7 +15,7 @@ const POWER_KEY = 'active';
 const SCREEN_SCHEMA = 'org.gnome.desktop.screensaver';
 const SCREEN_KEY = 'idle-activation-enabled';
 
-let indicationmenu;
+let indicationbutton;
 //Icon variables for easy editing/customization:
 let DisabledIcon = 'preferences-desktop-screensaver-symbolic';
 let EnabledIcon = 'system-run-symbolic';
@@ -84,11 +84,11 @@ InhibitButton.prototype = {
     },
 
     destroy: function() {
-        if (indicationmenu._powerSettings) {
-                indicationmenu._powerSettings.set_boolean(POWER_KEY, true);
+        if (this._powerSettings) {
+                this._powerSettings.set_boolean(POWER_KEY, true);
         }
-        if (indicationmenu._screenSettings) {
-                indicationmenu._screenSettings.set_boolean(SCREEN_KEY, true);
+        if (this._screenSettings) {
+                this._screenSettings.set_boolean(SCREEN_KEY, true);
         }
 
         Main.panel._statusArea[ROLE] = null;
@@ -105,9 +105,9 @@ function init(extensionMeta) {
 }
 
 function enable() {
-        indicationmenu = new InhibitButton();
+        indicationbutton = new InhibitButton();
 }
 
 function disable() {
-	indicationmenu.destroy();
+	indicationbutton.destroy();
 }
