@@ -2,6 +2,7 @@
 const DBus = imports.dbus;
 const Lang = imports.lang;
 const St = imports.gi.St;
+const Gio = imports.gi.Gio;
 
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
@@ -12,22 +13,16 @@ const UserMenu = imports.ui.userMenu;
 const Gettext = imports.gettext.domain('gnome-shell-extension-inhibitapplet');
 const _ = Gettext.gettext;
 
-const SessionIface = {
-    name: "org.gnome.SessionManager",
-    methods: [ 
-    { name: "Inhibit", inSignature: "susu", outSignature: "u" },
-    { name: "Uninhibit", inSignature: "u", outSignature: "" }
-    ]
-};
+const POWER_SCHEMA = 'org.gnome.settings-daemon.plugins.power';
+const POWER_KEY = 'active';
+const SCREEN_SCHEMA = 'org.gnome.desktop.screensaver';
+const SCREEN_KEY = 'idle-activation-enabled';
 
-let SessionProxy = DBus.makeProxyClass(SessionIface);
 let indicationmenu;
-
 //Icon variables for easy editing/customization:
 let DisabledIcon = 'preferences-desktop-screensaver-symbolic';
 let EnabledIcon = 'system-run-symbolic';
-////An alternative icon could be:
-//let EnabledIcon = 'action-unavailable-symbolic';
+////An alternative icon could be 'action-unavailable-symbolic'
 
 function init(extensionMeta) {
     imports.gettext.bindtextdomain("gnome-shell-extension-inhibitapplet",
@@ -49,32 +44,29 @@ InhibitMenu.prototype = {
     _init: function() {
         PanelMenu.SystemStatusButton.prototype._init.call(this, DisabledIcon);
 
+        ///Power Setting
+        InhibitMenu._powerSettings = new Gio.Settings({ schema: POWER_SCHEMA });
+        var powerManagementFlag = InhibitMenu._powerSettings.get_boolean(POWER_KEY);
+        ///ScreenSaver Setting
+        InhibitMenu._screenSettings = new Gio.Settings({ schema: SCREEN_SCHEMA });
         //Add the Inhibit Option
-        this._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), false);
+        this._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), !powerManagementFlag);
         this.menu.addMenuItem(this._inhibitswitch);
-        this._inhibit = undefined;
-        this._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
-
-        this._onInhibit = function(cookie) {
-                this._inhibit = cookie;
-        };
+        //Make sure the screensaver enable is synchronized
+        InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, powerManagementFlag);
+        //Change Icon if necessary
+        if(!powerManagementFlag) {
+                this.setIcon(EnabledIcon);
+        }
 
         this._inhibitswitch.connect('toggled', Lang.bind(this, function() {
-                if(this._inhibit) {
-                        this._sessionProxy.UninhibitRemote(this._inhibit);
-                        this._inhibit = undefined;
-                        this.setIcon(DisabledIcon);
+                var powerManagementFlag = InhibitMenu._powerSettings.get_boolean(POWER_KEY);
+                InhibitMenu._powerSettings.set_boolean(POWER_KEY, !powerManagementFlag);
+                InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, !powerManagementFlag);
+                if(powerManagementFlag) {
+                        this.setIcon(EnabledIcon);
                 } else {
-                        try {
-                                this._sessionProxy.InhibitRemote("inhibitor",
-                                        0, 
-                                        "inhibit mode",
-                                        9,
-                                Lang.bind(this, this._onInhibit));
-                                this.setIcon(EnabledIcon);
-                        } catch(e) {
-                                //
-                        }
+                        this.setIcon(DisabledIcon);
                 }
         }));
     },
@@ -82,4 +74,10 @@ InhibitMenu.prototype = {
 
 function disable() {
 	indicationmenu.destroy();
+        if (InhibitMenu._powerSettings) {
+                InhibitMenu._powerSettings.set_boolean(POWER_KEY, true);
+        }
+        if (InhibitMenu._screenSettings) {
+                InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, true);
+        }
 }
