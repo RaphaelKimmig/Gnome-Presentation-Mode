@@ -21,62 +21,93 @@ let DisabledIcon = 'preferences-desktop-screensaver-symbolic';
 let EnabledIcon = 'system-run-symbolic';
 ////An alternative icon could be 'action-unavailable-symbolic'
 
+const TOOLTIPON         = _("Suspend Inhibited");
+const TOOLTIPOFF        = _("Suspend Enabled");
+const ROLE              = 'inhibitbutton';
+
+function InhibitButton() {
+    this._init.apply(this, arguments);
+}
+
+InhibitButton.prototype = {
+    __proto__: PanelMenu.ButtonBox.prototype,
+
+    __proto__: PanelMenu.ButtonBox.prototype,
+
+    _init: function(metadata, params)
+    {
+        PanelMenu.ButtonBox.prototype._init.call(this, {
+            reactive:       true,
+            can_focus:      true,
+            track_hover:    true
+        });
+
+        this.temp = new St.Icon({
+            icon_name:      DisabledIcon,
+            icon_type:      St.IconType.SYMBOLIC,
+            style_class:    'system-status-icon'
+        });
+
+        this.actor.add_actor(this.temp);
+
+        this.actor.add_style_class_name('panel-status-button');
+        this.actor.has_tooltip = true;
+        this.actor.tooltip_text = TOOLTIPOFF;
+
+        ///Power Setting
+        this._powerSettings = new Gio.Settings({ schema: POWER_SCHEMA });
+        var powerManagementFlag = this._powerSettings.get_boolean(POWER_KEY);
+        ///ScreenSaver Setting
+        this._screenSettings = new Gio.Settings({ schema: SCREEN_SCHEMA });
+        //Make sure the screensaver enable is synchronized
+        this._screenSettings.set_boolean(SCREEN_KEY, powerManagementFlag);
+        //Change Icon if necessary
+        if(!powerManagementFlag) {
+                this.actor.tooltip_text = TOOLTIPON;
+                this.temp.icon_name = EnabledIcon;
+        }
+
+        this.actor.connect('button-press-event', Lang.bind(this, function () {
+                var powerManagementFlag = this._powerSettings.get_boolean(POWER_KEY);
+                this._powerSettings.set_boolean(POWER_KEY, !powerManagementFlag);
+                this._screenSettings.set_boolean(SCREEN_KEY, !powerManagementFlag);
+                if(powerManagementFlag) {
+                        this.actor.tooltip_text = TOOLTIPON;
+                        this.temp.icon_name = EnabledIcon;
+                } else {
+                        this.actor.tooltip_text = TOOLTIPOFF;
+                        this.temp.icon_name = DisabledIcon;
+                }
+        }));
+        Main.panel._insertStatusItem(this.actor, 0);
+        Main.panel._statusArea[ROLE] = this;
+    },
+
+    destroy: function() {
+        if (indicationmenu._powerSettings) {
+                indicationmenu._powerSettings.set_boolean(POWER_KEY, true);
+        }
+        if (indicationmenu._screenSettings) {
+                indicationmenu._screenSettings.set_boolean(SCREEN_KEY, true);
+        }
+
+        Main.panel._statusArea[ROLE] = null;
+
+        this.actor._delegate = null;
+        this.actor.destroy();
+        this.actor.emit('destroy');
+    }
+};
+
 function init(extensionMeta) {
     imports.gettext.bindtextdomain("gnome-shell-extension-inhibitapplet",
                            extensionMeta.path + "/locale");
 }
 
-function InhibitMenu() {
-    this._init.apply(this, arguments);
-}
-
 function enable() {
-    indicationmenu = new InhibitMenu();
-    Main.panel.addToStatusArea('inhibit-menu', indicationmenu);
+        indicationmenu = new InhibitButton();
 }
-
-InhibitMenu.prototype = {
-    __proto__: PanelMenu.SystemStatusButton.prototype,
-
-    _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, DisabledIcon);
-
-        ///Power Setting
-        InhibitMenu._powerSettings = new Gio.Settings({ schema: POWER_SCHEMA });
-        var powerManagementFlag = InhibitMenu._powerSettings.get_boolean(POWER_KEY);
-        ///ScreenSaver Setting
-        InhibitMenu._screenSettings = new Gio.Settings({ schema: SCREEN_SCHEMA });
-        //Make sure the screensaver enable is synchronized
-        InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, powerManagementFlag);
-
-        //Add the Inhibit Option
-        this._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), !powerManagementFlag);
-        this.menu.addMenuItem(this._inhibitswitch);
-
-        //Change Icon if necessary
-        if(!powerManagementFlag) {
-                this.setIcon(EnabledIcon);
-        }
-
-        this._inhibitswitch.connect('toggled', Lang.bind(this, function() {
-                var powerManagementFlag = InhibitMenu._powerSettings.get_boolean(POWER_KEY);
-                InhibitMenu._powerSettings.set_boolean(POWER_KEY, !powerManagementFlag);
-                InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, !powerManagementFlag);
-                if(powerManagementFlag) {
-                        this.setIcon(EnabledIcon);
-                } else {
-                        this.setIcon(DisabledIcon);
-                }
-        }));
-    },
-};
 
 function disable() {
 	indicationmenu.destroy();
-        if (InhibitMenu._powerSettings) {
-                InhibitMenu._powerSettings.set_boolean(POWER_KEY, true);
-        }
-        if (InhibitMenu._screenSettings) {
-                InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, true);
-        }
 }
