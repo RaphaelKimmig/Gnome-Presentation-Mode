@@ -1,5 +1,4 @@
 /* -*- mode: js2 - indent-tabs-mode: nil - js2-basic-offset: 4 -*- */
-const DBus = imports.dbus;
 const Lang = imports.lang;
 const St = imports.gi.St;
 const Gio = imports.gi.Gio;
@@ -7,8 +6,6 @@ const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-const GnomeSession = imports.misc.gnomeSession;
-const UserMenu = imports.ui.userMenu;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-inhibitapplet');
 const _ = Gettext.gettext;
@@ -49,11 +46,13 @@ InhibitMenu.prototype = {
         var powerManagementFlag = InhibitMenu._powerSettings.get_boolean(POWER_KEY);
         ///ScreenSaver Setting
         InhibitMenu._screenSettings = new Gio.Settings({ schema: SCREEN_SCHEMA });
+        //Make sure the screensaver enable is synchronized
+        InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, powerManagementFlag);
+
         //Add the Inhibit Option
         this._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), !powerManagementFlag);
         this.menu.addMenuItem(this._inhibitswitch);
-        //Make sure the screensaver enable is synchronized
-        InhibitMenu._screenSettings.set_boolean(SCREEN_KEY, powerManagementFlag);
+
         //Change Icon if necessary
         if(!powerManagementFlag) {
                 this.setIcon(EnabledIcon);
