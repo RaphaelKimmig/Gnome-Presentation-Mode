@@ -2,6 +2,7 @@
 const DBus = imports.dbus;
 const Lang = imports.lang;
 const St = imports.gi.St;
+const Gio = imports.gi.Gio;
 
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
@@ -11,16 +12,8 @@ const UserMenu = imports.ui.userMenu;
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-inhibitapplet');
 const _ = Gettext.gettext;
-
-const SessionIface = {
-    name: "org.gnome.SessionManager",
-    methods: [ 
-    { name: "Inhibit", inSignature: "susu", outSignature: "u" },
-    { name: "Uninhibit", inSignature: "u", outSignature: "" }
-    ]
-};
-
-let SessionProxy = DBus.makeProxyClass(SessionIface);
+const POWER_SCHEMA = 'org.gnome.settings-daemon.plugins.power';	
+const POWER_KEY = 'active';
 let indicationmenu;
 
 //Icon variables for easy editing/customization:
@@ -50,31 +43,18 @@ InhibitMenu.prototype = {
         PanelMenu.SystemStatusButton.prototype._init.call(this, DisabledIcon);
 
         //Add the Inhibit Option
-        this._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), false);
+        InhibitMenu._powerSettings = new Gio.Settings({ schema: POWER_SCHEMA });
+        var powerManagementFlag = InhibitMenu._powerSettings.get_boolean(POWER_KEY);
+        this._inhibitswitch = new PopupMenu.PopupSwitchMenuItem(_("Inhibit Suspend"), !powerManagementFlag);
         this.menu.addMenuItem(this._inhibitswitch);
-        this._inhibit = undefined;
-        this._sessionProxy = new SessionProxy(DBus.session, 'org.gnome.SessionManager', '/org/gnome/SessionManager');
-
-        this._onInhibit = function(cookie) {
-                this._inhibit = cookie;
-        };
 
         this._inhibitswitch.connect('toggled', Lang.bind(this, function() {
-                if(this._inhibit) {
-                        this._sessionProxy.UninhibitRemote(this._inhibit);
-                        this._inhibit = undefined;
-                        this.setIcon(DisabledIcon);
+                var powerManagementFlag = InhibitMenu._powerSettings.get_boolean(POWER_KEY);
+                InhibitMenu._powerSettings.set_boolean(POWER_KEY, !powerManagementFlag);
+                if(powerManagementFlag) {
+                        this.setIcon(EnabledIcon);
                 } else {
-                        try {
-                                this._sessionProxy.InhibitRemote("inhibitor",
-                                        0, 
-                                        "inhibit mode",
-                                        9,
-                                Lang.bind(this, this._onInhibit));
-                                this.setIcon(EnabledIcon);
-                        } catch(e) {
-                                //
-                        }
+                        this.setIcon(DisabledIcon);
                 }
         }));
     },
@@ -82,4 +62,7 @@ InhibitMenu.prototype = {
 
 function disable() {
 	indicationmenu.destroy();
+        if (InhibitMenu._powerSettings) {
+                InhibitMenu._powerSettings.set_boolean(POWER_KEY, false);
+        }
 }
