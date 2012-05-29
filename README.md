@@ -2,12 +2,13 @@
 
 Gnome Shell Extension Inhibit Applet is a gnome shell extension that gives you the ability to inhibit auto-suspend or screensaver from activating, simular to the original applet in gnome 2. It will add a new menu on the panel with a dynamically changing icon to allow the user to see if the inhibit applet is on without having to open the menu.
 
-This was forked from Raphael Kimmig's Gnome-Presentation-Mode, in hopes to improve it and add more translations. I don't take an credit for the work that he has done on this extension so far.
-
-![Screenshot](https://github.com/Mystro256/gnome-shell-extension-inhibit-applet/raw/master/Screenshot.png)
+![Screenshot](https://github.com/RaphaelKimmig/Gnome-Presentation-Mode/blob/master/Screenshot.png)
 
 ## Installation instructions:
-Go onto https://extensions.gnome.org and find the extension. It's much easier to install it through that website than manually.
+Install it via extensions.gnome.org:
+https://extensions.gnome.org/extension/233/inhibit-applet/
+It's much easier than installing manually.
+
 If you wish to install it manually, just copy the "inhibit-applet@alexjnewt.hotmail.com" folder into:
 ~/.local/share/gnome-shell/extensions
 
